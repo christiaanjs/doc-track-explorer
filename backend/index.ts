@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { fetchDocJsonData, DocJSON } from './docApi';
 import { Cache } from './cache';
 import { GeoJSON } from './geoJson';
+import { convertToGpx } from './gpxConverter';
 
 dotenv.config();
 
@@ -61,6 +62,20 @@ app.get('/trackData/:trackIdString', async (req, res) => {
             }
         };
         res.json(geojson);
+    }
+});
+
+app.get('/downloadGpx/:trackIdString', async (req, res) => {
+    const { trackIdString } = req.params;
+    const docJsonData = await docJsonCache.getData();
+    const track = docJsonData.get(trackIdString);
+    if (!track) {
+        res.status(404).json({ error: 'Track not found' });
+    } else {
+        const gpx = convertToGpx(track);
+        res.setHeader('Content-Disposition', `attachment; filename="${track.name}.gpx"`);
+        res.setHeader('Content-Type', 'application/gpx+xml');
+        res.send(gpx);
     }
 });
 
