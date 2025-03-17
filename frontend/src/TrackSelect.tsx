@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { DataTable, DataTableFilterMeta, DataTableSelectionSingleChangeEvent, } from 'primereact/datatable';
-import { Column } from 'primereact/column';
+import { Column, ColumnFilterElementTemplateOptions } from 'primereact/column';
 import { Dropdown } from 'primereact/dropdown';
+import { InputText } from 'primereact/inputtext';
+import { FilterMatchMode, FilterService } from 'primereact/api';
 import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
-import { FilterMatchMode, FilterService } from 'primereact/api';
-// import 'primeicons/primeicons.css';
 
 interface Track {
     id: string;
@@ -19,13 +19,9 @@ interface TrackSelectProps {
 }
 
 const TrackSelect: React.FC<TrackSelectProps> = ({ updateSelectedTrackId }) => {
-    // State to store the items fetched from API
     const [trackChoices, setTrackChoices] = useState<Track[]>([]);
-    // State to store the selected item ID
     const [selectedTrack, setSelectedTrack] = useState<Track | undefined>(undefined);
-    // State to store the unique regions for the dropdown filter
     const [regions, setRegions] = useState<string[]>([]);
-    // State to store the filters
     const [filters, setFilters] = useState<DataTableFilterMeta>({
         region: { value: null, matchMode: FilterMatchMode.CUSTOM },
         trackName: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -33,7 +29,8 @@ const TrackSelect: React.FC<TrackSelectProps> = ({ updateSelectedTrackId }) => {
 
     // Fetch the items from the API
     useEffect(() => {
-        fetch('http://localhost:4000/tracks').then(res => res.json()).then((data: Track[]) => {
+        const backendHost = import.meta.env.VITE_BACKEND_HOST;
+        fetch(`${backendHost}/tracks`).then(res => res.json()).then((data: Track[]) => {
             setTrackChoices(data);
             const regions = new Set(data.flatMap((track: Track) => track.region));
             setRegions(Array.from(regions));
@@ -41,6 +38,7 @@ const TrackSelect: React.FC<TrackSelectProps> = ({ updateSelectedTrackId }) => {
     }, []);
 
     // Register the custom filter function
+    // Seems to be the only way to get custom filter to work
     FilterService.register('custom_region', (value, filter) => {
         if (!filter) return true;
         return value.some((region: string) => region.includes(filter));
@@ -74,18 +72,15 @@ const TrackSelect: React.FC<TrackSelectProps> = ({ updateSelectedTrackId }) => {
         return rowData.region.join(', ');
     };
 
-    const trackNameFilterTemplate = (options: any) => {
+    const trackNameFilterTemplate = (options: ColumnFilterElementTemplateOptions) => {
         const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-            if (e.key === 'Enter') {
+            if ((e.key === 'Enter') && (e.currentTarget.value !== "")) {
                 options.filterApplyCallback(e.currentTarget.value);
             }
         };
 
         return (
-            <input
-                type="text"
-                value={options.value}
-                onChange={(e) => options.onChange(e.target.value)}
+            <InputText
                 onKeyDown={handleKeyDown}
                 placeholder="(press enter to search)"
                 className="p-inputtext p-component"
@@ -107,8 +102,8 @@ const TrackSelect: React.FC<TrackSelectProps> = ({ updateSelectedTrackId }) => {
                 filterDisplay="row"
                 globalFilterFields={['region', 'trackName']}
             >
-                <Column field="trackName" header="Track Name" filter filterElement={trackNameFilterTemplate} showFilterMenu={false} />
-                <Column field="region" header="Region" filter filterElement={regionFilterTemplate} body={regionBodyTemplate} showFilterMenu={false} />
+                <Column field="trackName" header="Track Name" filter filterElement={trackNameFilterTemplate} showFilterMenu={false} sortable />
+                <Column field="region" header="Region" filter filterElement={regionFilterTemplate} body={regionBodyTemplate} showFilterMenu={false} sortable />
                 <Column field="status" header="Status" showFilterMenu={false} />
             </DataTable>
         </div>

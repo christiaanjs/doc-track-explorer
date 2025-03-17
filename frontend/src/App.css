@@ -109,6 +109,10 @@ h1 {
   color: white;
 }
 
+.p-sortable-column-icon {
+  color: white;
+}
+
 /* Download button styling */
 button {
   background-color: var(--river-blue);
