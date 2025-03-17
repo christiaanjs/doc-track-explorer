@@ -33,13 +33,15 @@ const App = () => {
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const geoJsonRef = useRef<L.GeoJSON | null>(null);
 
+  const backendHost = import.meta.env.VITE_BACKEND_HOST;
+
   const handleTrackIdSelection = async (id: string) => {
     try {
-      const response = await fetch(`http://localhost:4000/trackData/${id}`);
+      const response = await fetch(`${backendHost}/trackData/${id}`);
       const data = await response.json();
       setTrackData(data);
       setSelectedTrackId(id);
-      setDownloadUrl(`http://localhost:4000/downloadGpx/${id}`);
+      setDownloadUrl(`${backendHost}/downloadGpx/${id}`);
 
       const firstFeature = data.features[0];
       const center = getGeoJsonCentre(firstFeature);
