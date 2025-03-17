@@ -47,8 +47,11 @@ const TrackSelect: React.FC<TrackSelectProps> = ({ updateSelectedTrackId }) => {
     });
 
     const handleRowSelect = (e: DataTableSelectionSingleChangeEvent<Track[]>) => {
-        const trackId = e.value.id;
+        const track = e.value;
+        const trackId = track.id;
         updateSelectedTrackId(trackId);
+        setSelectedTrack(track);
+
     };
 
     const handleFilterChange = (e: any) => {
@@ -72,12 +75,19 @@ const TrackSelect: React.FC<TrackSelectProps> = ({ updateSelectedTrackId }) => {
     };
 
     const trackNameFilterTemplate = (options: any) => {
+        const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+            if (e.key === 'Enter') {
+                options.filterApplyCallback(e.currentTarget.value);
+            }
+        };
+
         return (
             <input
                 type="text"
                 value={options.value}
-                onChange={(e) => options.filterApplyCallback(e.target.value)}
-                placeholder="Search by Track Name"
+                onChange={(e) => options.onChange(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="(press enter to search)"
                 className="p-inputtext p-component"
             />
         );
