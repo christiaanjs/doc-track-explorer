@@ -28,6 +28,8 @@ const MapUpdater = ({ mapCenter }: { mapCenter: [number, number] }) => {
 const App = () => {
   const [trackData, setTrackData] = useState<any>();
   const [mapCenter, setMapCenter] = useState<[number, number]>([-36.8485, 174.7633]);
+  const [selectedTrackId, setSelectedTrackId] = useState<string | null>(null);
+  const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const geoJsonRef = useRef<L.GeoJSON | null>(null);
 
   const handleTrackIdSelection = async (id: string) => {
@@ -35,6 +37,8 @@ const App = () => {
       const response = await fetch(`http://localhost:4000/trackData/${id}`);
       const data = await response.json();
       setTrackData(data);
+      setSelectedTrackId(id);
+      setDownloadUrl(`http://localhost:4000/downloadGpx/${id}`);
 
       const firstFeature = data.features[0];
       const center = getGeoJsonCentre(firstFeature);
@@ -55,6 +59,9 @@ const App = () => {
     <div>
       <h1>DoC Track Explorer</h1>
       <TrackSelect updateSelectedTrackId={handleTrackIdSelection} />
+      <a href={downloadUrl || '#'} download>
+        <button disabled={!selectedTrackId}>Download GPX</button>
+      </a>
       <MapContainer center={mapCenter} zoom={12} style={{ height: '500px' }}>
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         <GeoJSON ref={geoJsonRef} data={trackData} />
