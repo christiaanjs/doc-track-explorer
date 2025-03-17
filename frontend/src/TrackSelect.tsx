@@ -107,9 +107,9 @@ const TrackSelect: React.FC<TrackSelectProps> = ({ updateSelectedTrackId }) => {
                 filterDisplay="row"
                 globalFilterFields={['region', 'trackName']}
             >
-                <Column field="trackName" header="Track Name" filter filterElement={trackNameFilterTemplate} />
-                <Column field="region" header="Region" filter filterElement={regionFilterTemplate} body={regionBodyTemplate} />
-                <Column field="status" header="Status" />
+                <Column field="trackName" header="Track Name" filter filterElement={trackNameFilterTemplate} showFilterMenu={false} />
+                <Column field="region" header="Region" filter filterElement={regionFilterTemplate} body={regionBodyTemplate} showFilterMenu={false} />
+                <Column field="status" header="Status" showFilterMenu={false} />
             </DataTable>
         </div>
     );

@@ -1,42 +1,212 @@
-#root {
-  max-width: 1280px;
+/* Main theme colors */
+:root {
+  --forest-green: #2A5E41;
+  --moss-green: #4D7C50;
+  --trail-brown: #8B5A2B;
+  --light-stone: #F5F3E7;
+  --sky-blue: #6CA6C1;
+  --sunset-orange: #D76B40;
+  --rock-gray: #706F6F;
+  --river-blue: #3A7D9F;
+  --mountain-shadow: rgba(0, 0, 0, 0.2);
+}
+
+/* Global styles */
+body {
+  font-family: 'Open Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--light-stone);
+  color: #333;
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+}
+
+/* App container */
+div#root {
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  padding: 1rem;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+/* Header */
+h1 {
+  color: var(--forest-green);
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 1.5rem;
+  text-shadow: 1px 1px var(--mountain-shadow);
+  border-bottom: 4px solid var(--moss-green);
+  padding-bottom: 0.5rem;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+/* Map container styling */
+.leaflet-container {
+  border-radius: 8px;
+  box-shadow: 0 4px 8px var(--mountain-shadow);
+  margin: 1rem 0;
+  border: 3px solid var(--moss-green);
+}
+
+/* Track selection table */
+.p-datatable {
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 3px 6px var(--mountain-shadow);
+}
+
+.p-datatable .p-datatable-header {
+  background-color: var(--forest-green);
+  color: white;
+  padding: 1rem;
+}
+
+.p-datatable .p-datatable-thead>tr>th {
+  background-color: var(--moss-green);
+  color: white;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  border: none;
+}
+
+.p-datatable .p-datatable-tbody>tr {
+  background-color: white;
+  transition: background-color 0.2s;
+}
+
+.p-datatable .p-datatable-tbody>tr:nth-child(even) {
+  background-color: var(--light-stone);
+}
+
+.p-datatable .p-datatable-tbody>tr:hover {
+  background-color: rgba(76, 175, 80, 0.1);
+}
+
+.p-datatable .p-datatable-tbody>tr.p-highlight {
+  background-color: rgba(76, 175, 80, 0.2);
+  color: var(--forest-green);
+}
+
+/* Filter row styling */
+.p-column-filter {
+  width: 100%;
+}
+
+.p-inputtext,
+.p-dropdown {
+  width: 100%;
+  border: 1px solid var(--rock-gray);
+  border-radius: 4px;
+  padding: 0.5rem;
+}
+
+.p-dropdown-label {
+  font-weight: normal;
+}
+
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight {
+  background-color: var(--moss-green);
+  color: white;
+}
+
+/* Download button styling */
+button {
+  background-color: var(--river-blue);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: inline-block;
+  margin: 1rem 0;
+  box-shadow: 0 2px 4px var(--mountain-shadow);
+}
+
+button:hover {
+  background-color: var(--sky-blue);
+}
+
+button:disabled {
+  background-color: var(--rock-gray);
+  cursor: not-allowed;
+}
+
+button:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 2px var(--mountain-shadow);
+}
+
+/* Download link styling */
+a {
+  text-decoration: none;
+}
+
+/* Add some trail markers as bullet points */
+ul {
+  list-style: none;
+  padding-left: 1.5rem;
+}
+
+ul li:before {
+  content: "⛰️";
+  margin-right: 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2rem;
   }
-  to {
-    transform: rotate(360deg);
+
+  .p-datatable {
+    font-size: 0.9rem;
+  }
+
+  button {
+    width: 100%;
+    margin: 0.5rem 0;
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+/* Leaflet control styling */
+.leaflet-control-zoom {
+  border: 2px solid var(--moss-green) !important;
+  border-radius: 4px !important;
 }
 
-.card {
-  padding: 2em;
+.leaflet-control-zoom a {
+  background-color: var(--light-stone) !important;
+  color: var(--forest-green) !important;
 }
 
-.read-the-docs {
-  color: #888;
+.leaflet-control-zoom a:hover {
+  background-color: white !important;
+}
+
+/* Map attribution styling */
+.leaflet-control-attribution {
+  background-color: rgba(255, 255, 255, 0.7) !important;
+  font-size: 0.8rem !important;
+}
+
+/* Enhance table display */
+.p-datatable-scrollable-body {
+  scrollbar-width: thin;
+  scrollbar-color: var(--moss-green) var(--light-stone);
+}
+
+.p-datatable-scrollable-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.p-datatable-scrollable-body::-webkit-scrollbar-track {
+  background: var(--light-stone);
+}
+
+.p-datatable-scrollable-body::-webkit-scrollbar-thumb {
+  background-color: var(--moss-green);
+  border-radius: 4px;
 }

@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from 'react';
 import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import TrackSelect from './TrackSelect';
+import './App.css';
 
 // Helper function to get the center of a GeoJSON feature
 const getGeoJsonCentre = (geoJsonFeature: any): [number, number] => {
