@@ -7,7 +7,7 @@ export interface DocJSON {
     "assetId": string;
     name: string;
     status: "OPEN" | "CLSD";
-    region: string;
+    region: string[];
     y: number;
     x: number;
     line: [number, number][][]; // Array of numeric (X, Y) coordinates

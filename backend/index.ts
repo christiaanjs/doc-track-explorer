@@ -15,6 +15,8 @@ app.use(express.json());
 interface Track {
     id: string;
     trackName: string;
+    region: string;
+    status: string;
 }
 
 const ONE_DAY = 24 * 60 * 60 * 1000;
@@ -27,7 +29,9 @@ app.get('/tracks', async (req, res) => {
     const docJsonData = await docJsonCache.getData();
     const tracks: Track[] = Array.from(docJsonData.values()).map((track: DocJSON) => ({
         id: track.assetId,
-        trackName: track.name
+        trackName: track.name,
+        region: track.region,
+        status: track.status
     }));
     res.json(tracks);
 });
