@@ -1,46 +1,44 @@
 import L from 'leaflet';
 import { useEffect, useState, useRef } from 'react';
-import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet'
+import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import TrackSelect from './TrackSelect';
 
+// Helper function to get the center of a GeoJSON feature
 const getGeoJsonCentre = (geoJsonFeature: any): [number, number] => {
   const geojsonLayer = L.geoJSON(geoJsonFeature);
   const bounds = geojsonLayer.getBounds();
-  const center = bounds.getCenter();  // Gets the middle point of the bounds
-  return [center.lat, center.lng]; // Return as [latitude, longitude]
+  const center = bounds.getCenter();
+  return [center.lat, center.lng];
 };
 
+// Component to update the map center
 const MapUpdater = ({ mapCenter }: { mapCenter: [number, number] }) => {
   const map = useMap();
 
   useEffect(() => {
     if (map) {
-      map.setView(mapCenter, map.getZoom());  // Update the map's center
+      map.setView(mapCenter, map.getZoom());
     }
   }, [mapCenter, map]);
 
-  return null; // This component doesn't render anything to the DOM
+  return null;
 };
 
-
 const App = () => {
-  // const [trackId, setTrackId] = useState<number | null>(null);
   const [trackData, setTrackData] = useState<any>();
   const [mapCenter, setMapCenter] = useState<[number, number]>([-36.8485, 174.7633]);
   const geoJsonRef = useRef<L.GeoJSON | null>(null);
 
-  const handleTrackIdSelection = async (id: number) => {
-    // setTrackId(id);
+  const handleTrackIdSelection = async (id: string) => {
     try {
-      // Make the API call to filter GeoJSON by the selected ID
       const response = await fetch(`http://localhost:4000/trackData/${id}`);
       const data = await response.json();
       setTrackData(data);
 
       const firstFeature = data.features[0];
-      const center = getGeoJsonCentre(firstFeature); // Use the helper function to get the center
-      setMapCenter(center); // Update map center with centroid
+      const center = getGeoJsonCentre(firstFeature);
+      setMapCenter(center);
     } catch (error) {
       console.error("Error fetching filtered GeoJSON:", error);
     }
@@ -48,14 +46,10 @@ const App = () => {
 
   useEffect(() => {
     if (geoJsonRef.current && trackData) {
-      // Clear the previous GeoJSON layer
       geoJsonRef.current.clearLayers();
-
-      // Add new GeoJSON data
       geoJsonRef.current.addData(trackData);
     }
   }, [trackData]);
-
 
   return (
     <div>

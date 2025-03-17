@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from 'react';
 
 interface Track {
-    id: number;
+    id: string;
     trackName: string;
 }
 
 interface TrackSelectProps {
-    updateSelectedTrackId: (trackId: number) => void;
+    updateSelectedTrackId: (trackId: string) => void;
 }
 
 const TrackSelect: React.FC<TrackSelectProps> = ({ updateSelectedTrackId }) => {
     // State to store the items fetched from API
     const [trackChoices, setTrackChoices] = useState<Track[]>([]);
     // State to store the selected item ID
-    const [selectedTrackId, setSelectedTrackId] = useState<number | undefined>(undefined);
+    const [selectedTrackId, setSelectedTrackId] = useState<string | undefined>(undefined);
 
     // Fetch the items from the API
     useEffect(() => {
@@ -22,7 +22,7 @@ const TrackSelect: React.FC<TrackSelectProps> = ({ updateSelectedTrackId }) => {
 
     // Handle dropdown change
     const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const trackId = Number(event.target.value);
+        const trackId = event.target.value;
         setSelectedTrackId(trackId);
         updateSelectedTrackId(trackId);
     };

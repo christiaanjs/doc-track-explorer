@@ -2,10 +2,13 @@
 
 Basic web app to visualise DoC track data on OpenStreetMap.
 
-## Data
+## Setup
 
-Download GeoJSON from here: https://doc-deptconservation.opendata.arcgis.com/datasets/93fbf16365a444efba0a976f6cc56759_0/explore
-And place in data directory.
+### Department of Conservation API
+
+1. Create an account at [](https://api.doc.govt.nz/getting-started)
+2. Get a DoC API key and add it to the `DOC_API_KEY` variable in `backend/.env`
+3. Subscribe to the `v1/tracks` endpoint
 
 ## Backend
 * Typescript

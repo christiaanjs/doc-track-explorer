@@ -1,64 +1,69 @@
 import express from 'express';
 import cors from 'cors';
-import fs from 'fs';
+import dotenv from 'dotenv';
+import { fetchDocJsonData, DocJSON } from './docApi';
+import { Cache } from './cache';
+import { GeoJSON } from './geoJson';
+
+dotenv.config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 interface Track {
-    id: number;
+    id: string;
     trackName: string;
 }
 
-interface GeoJSONFeature {
-    type: string;
-    geometry: object;
-    properties: object;
-    id?: string | number; // id can be string or number
-}
+const ONE_DAY = 24 * 60 * 60 * 1000;
+const docJsonCache = new Cache<Map<string, DocJSON>>(ONE_DAY, async () => {
+    const data = await fetchDocJsonData();
+    return new Map(data.map((track: DocJSON) => [track.assetId, track]));
+});
 
-interface CRS {
-    type: string; // "name" or "link" (according to GeoJSON spec)
-    properties: {
-        name: string; // Name of the CRS, e.g., "EPSG:4326"
-    };
-}
-
-interface GeoJSON {
-    type: "FeatureCollection";
-    features: GeoJSONFeature[];
-    crs?: CRS; // Optional CRS property
-}
-
-const geojsonData: GeoJSON = JSON.parse(fs.readFileSync('../data/DOC_Tracks_EAM_2002748551359867855.geojson', 'utf-8'));
-const tracks: Track[] = geojsonData.features.map((feature: any) => { return { id: feature.id, trackName: feature.properties.TechObjectName } })
-
-const filterGeoJSONFeaturesById = (geojson: GeoJSON, id: number | string): GeoJSON => {
-    const filteredFeatures = geojson.features.filter(feature => feature.id === id);
-    return {
-        type: "FeatureCollection", // Keep the type as "FeatureCollection"
-        features: filteredFeatures,
-        crs: geojson.crs, // Keep the CRS from the original GeoJSON
-    };
-}
-
-app.get('/tracks', (req, res) => {
+app.get('/tracks', async (req, res) => {
+    const docJsonData = await docJsonCache.getData();
+    const tracks: Track[] = Array.from(docJsonData.values()).map((track: DocJSON) => ({
+        id: track.assetId,
+        trackName: track.name
+    }));
     res.json(tracks);
 });
 
-
-app.get('/trackData/:trackIdString', (req, res) => {
+app.get('/trackData/:trackIdString', async (req, res) => {
     const { trackIdString } = req.params;
-    const trackId = parseInt(trackIdString);
-    if (isNaN(trackId)) {
-        res.status(400).json({ error: 'Invalid ID' });
-    };
-    const filtered = filterGeoJSONFeaturesById(geojsonData, trackId);
-    res.json(filtered);
+    const docJsonData = await docJsonCache.getData();
+    const track = docJsonData.get(trackIdString);
+    if (!track) {
+        res.status(404).json({ error: 'Track not found' });
+    } else {
+        const geojson: GeoJSON = {
+            type: "FeatureCollection",
+            features: [{
+                type: "Feature",
+                geometry: {
+                    type: "MultiLineString",
+                    coordinates: track.line
+                },
+                properties: {
+                    name: track.name,
+                    region: track.region,
+                    status: track.status
+                },
+                id: track.assetId
+            }],
+            crs: {
+                type: "name",
+                properties: {
+                    name: "EPSG:4326"
+                }
+            }
+        };
+        res.json(geojson);
+    }
 });
 
 app.listen(4000, () => {
     console.log('Server running on http://localhost:4000');
 });
-
