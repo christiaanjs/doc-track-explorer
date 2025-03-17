@@ -29,7 +29,7 @@ const TrackSelect: React.FC<TrackSelectProps> = ({ updateSelectedTrackId }) => {
 
     return (
         <div>
-            <select value={selectedTrackId} onChange={handleSelectChange}>
+            <select className="track-select" value={selectedTrackId} onChange={handleSelectChange}>
                 <option value="" disabled>Select a track</option>
                 {trackChoices.map((item) => (
                     <option key={item.id} value={item.id}>
@@ -37,10 +37,6 @@ const TrackSelect: React.FC<TrackSelectProps> = ({ updateSelectedTrackId }) => {
                     </option>
                 ))}
             </select>
-
-            <div>
-                Selected Track ID: {selectedTrackId}
-            </div>
         </div>
     );
 };
