@@ -104,7 +104,6 @@ const TrackSelect: React.FC<TrackSelectProps> = ({ updateSelectedTrackId }) => {
             >
                 <Column field="trackName" header="Track Name" filter filterElement={trackNameFilterTemplate} showFilterMenu={false} sortable />
                 <Column field="region" header="Region" filter filterElement={regionFilterTemplate} body={regionBodyTemplate} showFilterMenu={false} sortable />
-                <Column field="status" header="Status" showFilterMenu={false} />
             </DataTable>
         </div>
     );

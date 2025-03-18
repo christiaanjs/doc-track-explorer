@@ -15,7 +15,7 @@ app.use(express.json());
 interface Track {
     id: string;
     trackName: string;
-    region: string;
+    region: string[];
     status: string;
 }
 
@@ -24,6 +24,19 @@ const docJsonCache = new Cache<Map<string, DocJSON>>(ONE_DAY, async () => {
     const data = await fetchDocJsonData();
     return new Map(data.map((track: DocJSON) => [track.assetId, track]));
 });
+const mapStatus = (status: string): string => {
+    if (status === undefined) {
+        return "Unknown";
+    }
+    switch (status) {
+        case "OPEN":
+            return "Open";
+        case "CLSD":
+            return "Closed";
+        default:
+            return status;
+    }
+};
 
 app.get('/tracks', async (req, res) => {
     const docJsonData = await docJsonCache.getData();
@@ -31,7 +44,7 @@ app.get('/tracks', async (req, res) => {
         id: track.assetId,
         trackName: track.name,
         region: track.region,
-        status: track.status
+        status: mapStatus(track.status)
     }));
     res.json(tracks);
 });
