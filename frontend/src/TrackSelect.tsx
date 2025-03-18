@@ -18,14 +18,17 @@ interface TrackSelectProps {
     updateSelectedTrackId: (trackId: string) => void;
 }
 
+const TRACKS_INIT = [{ id: '', trackName: 'Loading tracks...', region: [''], status: '' }];
+
 const TrackSelect: React.FC<TrackSelectProps> = ({ updateSelectedTrackId }) => {
-    const [trackChoices, setTrackChoices] = useState<Track[]>([]);
+    const [trackChoices, setTrackChoices] = useState<Track[]>(TRACKS_INIT);
     const [selectedTrack, setSelectedTrack] = useState<Track | undefined>(undefined);
     const [regions, setRegions] = useState<string[]>([]);
     const [filters, setFilters] = useState<DataTableFilterMeta>({
         region: { value: null, matchMode: FilterMatchMode.CUSTOM },
         trackName: { value: null, matchMode: FilterMatchMode.CONTAINS },
     });
+    const [loading, setLoading] = useState(true);
 
     // Fetch the items from the API
     useEffect(() => {
@@ -34,6 +37,7 @@ const TrackSelect: React.FC<TrackSelectProps> = ({ updateSelectedTrackId }) => {
             setTrackChoices(data);
             const regions = new Set(data.flatMap((track: Track) => track.region));
             setRegions(Array.from(regions));
+            setLoading(false); // Set loading to false after data is fetched
         });
     }, []);
 
@@ -101,6 +105,7 @@ const TrackSelect: React.FC<TrackSelectProps> = ({ updateSelectedTrackId }) => {
                 onFilter={handleFilterChange}
                 filterDisplay="row"
                 globalFilterFields={['region', 'trackName']}
+                loading={loading}
             >
                 <Column field="trackName" header="Track Name" filter filterElement={trackNameFilterTemplate} showFilterMenu={false} sortable />
                 <Column field="region" header="Region" filter filterElement={regionFilterTemplate} body={regionBodyTemplate} showFilterMenu={false} sortable />

@@ -4,6 +4,7 @@ import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import TrackSelect from './TrackSelect';
 import './App.css';
+import { ProgressSpinner } from 'primereact/progressspinner';
 
 // Helper function to get the center of a GeoJSON feature
 const getGeoJsonCentre = (geoJsonFeature: any): [number, number] => {
@@ -31,12 +32,14 @@ const App = () => {
   const [mapCenter, setMapCenter] = useState<[number, number]>([-36.8485, 174.7633]);
   const [selectedTrackId, setSelectedTrackId] = useState<string | null>(null);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+  const [loadingMap, setLoadingMap] = useState(false);
   const geoJsonRef = useRef<L.GeoJSON | null>(null);
 
   const backendHost = import.meta.env.VITE_BACKEND_HOST || "";
 
   const handleTrackIdSelection = async (id: string) => {
     try {
+      setLoadingMap(true); // Set loading to true before fetching data
       const response = await fetch(`${backendHost}/api/trackData/${id}`);
       const data = await response.json();
       setTrackData(data);
@@ -48,6 +51,8 @@ const App = () => {
       setMapCenter(center);
     } catch (error) {
       console.error("Error fetching filtered GeoJSON:", error);
+    } finally {
+      setLoadingMap(false); // Set loading to false after data is fetched
     }
   };
 
@@ -65,11 +70,18 @@ const App = () => {
       <a href={downloadUrl || '#'} download>
         <button disabled={!selectedTrackId}>Download GPX</button>
       </a>
-      <MapContainer center={mapCenter} zoom={12} style={{ height: '500px' }}>
-        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-        <GeoJSON ref={geoJsonRef} data={trackData} />
-        <MapUpdater mapCenter={mapCenter} />
-      </MapContainer>
+      <div className="map-container">
+        <MapContainer center={mapCenter} zoom={12} style={{ height: '500px' }}>
+          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          <GeoJSON ref={geoJsonRef} data={trackData} />
+          <MapUpdater mapCenter={mapCenter} />
+        </MapContainer>
+        {loadingMap && (
+          <div className="loading-overlay">
+            <ProgressSpinner />
+          </div>
+        )}
+      </div>
     </div>
   );
 };
