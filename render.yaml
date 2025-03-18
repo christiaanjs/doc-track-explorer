@@ -2,7 +2,7 @@ services:
   - type: web
     name: doc-track-explorer-backend
     env: node
-    buildCommand: cd backend && npm install && npm run build
+    buildCommand: cd backend && npm install --include=dev && npm run build && npm prune --omit=dev
     startCommand: cd backend && npm start
     envVars:
       - key: NODE_ENV
