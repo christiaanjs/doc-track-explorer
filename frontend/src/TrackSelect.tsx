@@ -29,8 +29,8 @@ const TrackSelect: React.FC<TrackSelectProps> = ({ updateSelectedTrackId }) => {
 
     // Fetch the items from the API
     useEffect(() => {
-        const backendHost = import.meta.env.VITE_BACKEND_HOST;
-        fetch(`${backendHost}/tracks`).then(res => res.json()).then((data: Track[]) => {
+        const backendHost = import.meta.env.VITE_BACKEND_HOST || "";
+        fetch(`${backendHost}/api/tracks`).then(res => res.json()).then((data: Track[]) => {
             setTrackChoices(data);
             const regions = new Set(data.flatMap((track: Track) => track.region));
             setRegions(Array.from(regions));

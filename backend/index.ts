@@ -9,7 +9,11 @@ import { convertToGpx } from './gpxConverter';
 dotenv.config();
 
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: process.env.NODE_ENV === 'production'
+        ? 'https://doc-track-explorer.onrender.com'
+        : 'http://localhost:5173'
+}));
 app.use(express.json());
 
 interface Track {
@@ -38,7 +42,7 @@ const mapStatus = (status: string): string => {
     }
 };
 
-app.get('/tracks', async (req, res) => {
+app.get('/api/tracks', async (req, res) => {
     const docJsonData = await docJsonCache.getData();
     const tracks: Track[] = Array.from(docJsonData.values()).map((track: DocJSON) => ({
         id: track.assetId,
@@ -49,7 +53,7 @@ app.get('/tracks', async (req, res) => {
     res.json(tracks);
 });
 
-app.get('/trackData/:trackIdString', async (req, res) => {
+app.get('/api/trackData/:trackIdString', async (req, res) => {
     const { trackIdString } = req.params;
     const docJsonData = await docJsonCache.getData();
     const track = docJsonData.get(trackIdString);
@@ -82,7 +86,7 @@ app.get('/trackData/:trackIdString', async (req, res) => {
     }
 });
 
-app.get('/downloadGpx/:trackIdString', async (req, res) => {
+app.get('/api/downloadGpx/:trackIdString', async (req, res) => {
     const { trackIdString } = req.params;
     const docJsonData = await docJsonCache.getData();
     const track = docJsonData.get(trackIdString);
@@ -96,6 +100,7 @@ app.get('/downloadGpx/:trackIdString', async (req, res) => {
     }
 });
 
-app.listen(4000, () => {
-    console.log('Server running on http://localhost:4000');
+const port = process.env.PORT || 4000;
+app.listen(port, () => {
+    console.log(`Server running on http://localhost:${port}`);
 });
