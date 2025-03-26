@@ -42,15 +42,40 @@ const mapStatus = (status: string): string => {
     }
 };
 
+const mapDocTrackToTrack = (track: DocJSON): Track => ({
+    id: track.assetId,
+    trackName: track.name,
+    region: track.region,
+    status: mapStatus(track.status)
+});
+
 app.get('/api/tracks', async (req, res) => {
     const docJsonData = await docJsonCache.getData();
-    const tracks: Track[] = Array.from(docJsonData.values()).map((track: DocJSON) => ({
-        id: track.assetId,
-        trackName: track.name,
-        region: track.region,
-        status: mapStatus(track.status)
-    }));
+    const tracks: Track[] = Array.from(docJsonData.values()).map(mapDocTrackToTrack);
     res.json(tracks);
+});
+
+const mapDocTrackToGeoJson = (track: DocJSON): GeoJSON => ({
+    type: "FeatureCollection",
+    features: [{
+        type: "Feature",
+        geometry: {
+            type: "MultiLineString",
+            coordinates: track.line
+        },
+        properties: {
+            name: track.name,
+            region: track.region,
+            status: track.status
+        },
+        id: track.assetId
+    }],
+    crs: {
+        type: "name",
+        properties: {
+            name: "EPSG:4326"
+        }
+    }
 });
 
 app.get('/api/trackData/:trackIdString', async (req, res) => {
@@ -60,28 +85,7 @@ app.get('/api/trackData/:trackIdString', async (req, res) => {
     if (!track) {
         res.status(404).json({ error: 'Track not found' });
     } else {
-        const geojson: GeoJSON = {
-            type: "FeatureCollection",
-            features: [{
-                type: "Feature",
-                geometry: {
-                    type: "MultiLineString",
-                    coordinates: track.line
-                },
-                properties: {
-                    name: track.name,
-                    region: track.region,
-                    status: track.status
-                },
-                id: track.assetId
-            }],
-            crs: {
-                type: "name",
-                properties: {
-                    name: "EPSG:4326"
-                }
-            }
-        };
+        const geojson: GeoJSON = mapDocTrackToGeoJson(track);
         res.json(geojson);
     }
 });
@@ -104,3 +108,5 @@ const port = process.env.PORT || 4000;
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
 });
+
+export { mapDocTrackToTrack, mapDocTrackToGeoJson };

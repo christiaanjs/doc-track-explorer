@@ -1,6 +1,6 @@
 export class Cache<T> {
     private data: T | null = null;
-    private lastFetchTime: number = 0;
+    private lastFetchTime = 0;
     private readonly cacheDuration: number;
     private readonly fetchFunction: () => Promise<T>;
 
@@ -18,3 +18,4 @@ export class Cache<T> {
         return this.data;
     }
 }
+
