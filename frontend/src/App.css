@@ -208,6 +208,16 @@ ul li:before {
     font-size: 0.9rem;
   }
 
+  .p-datatable .p-datatable-thead>tr>th {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .custom-filter-input {
+    padding: 0.4rem;
+    font-size: 0.9rem;
+  }
+
   button {
     width: 100%;
     margin: 0.5rem 0;
@@ -252,4 +262,24 @@ ul li:before {
 .p-datatable-scrollable-body::-webkit-scrollbar-thumb {
   background-color: var(--moss-green);
   border-radius: 4px;
+}
+
+.p-column-filter-row .p-column-filter-element {
+  /* TODO: Make this only for trackselect */
+  width: 100%;
+}
+
+/* Custom filter input styling */
+.custom-filter-input {
+  width: 100%;
+  border: 1px solid var(--rock-gray);
+  border-radius: 4px;
+  padding: 0.5rem;
+  box-shadow: 0 2px 4px var(--mountain-shadow);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.custom-filter-input:focus {
+  border-color: var(--forest-green);
+  box-shadow: 0 2px 6px var(--mountain-shadow);
 }

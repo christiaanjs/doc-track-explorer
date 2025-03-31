@@ -1,13 +1,14 @@
 import L from 'leaflet';
-import { useEffect, useState, useRef } from 'react';
-import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet';
+import GeoJson from 'geojson';
+import { useEffect, useState, useRef, useContext, createContext } from 'react';
+import { MapContainer, TileLayer, GeoJSON as GeoJSONComponent, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import TrackSelect from './TrackSelect';
 import './App.css';
 import { ProgressSpinner } from 'primereact/progressspinner';
 
 // Helper function to get the center of a GeoJSON feature
-const getGeoJsonCentre = (geoJsonFeature: any): [number, number] => {
+const getGeoJsonCentre = (geoJsonFeature: GeoJson.GeoJsonObject): [number, number] => {
   const geojsonLayer = L.geoJSON(geoJsonFeature);
   const bounds = geojsonLayer.getBounds();
   const center = bounds.getCenter();
@@ -28,7 +29,7 @@ const MapUpdater = ({ mapCenter }: { mapCenter: [number, number] }) => {
 };
 
 const App = () => {
-  const [trackData, setTrackData] = useState<any>();
+  const [trackData, setTrackData] = useState<GeoJson.GeoJsonObject>();
   const [mapCenter, setMapCenter] = useState<[number, number]>([-36.8485, 174.7633]);
   const [selectedTrackId, setSelectedTrackId] = useState<string | null>(null);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
@@ -73,7 +74,7 @@ const App = () => {
       <div className="map-container">
         <MapContainer center={mapCenter} zoom={12} style={{ height: '500px' }}>
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-          <GeoJSON ref={geoJsonRef} data={trackData} />
+          {trackData && <GeoJSONComponent ref={geoJsonRef} data={trackData} />}
           <MapUpdater mapCenter={mapCenter} />
         </MapContainer>
         {loadingMap && (

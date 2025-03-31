@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { DataTable, DataTableFilterMeta, DataTableSelectionSingleChangeEvent, } from 'primereact/datatable';
+import React, { useEffect, useState, useMemo } from 'react';
+import { DataTable, DataTableFilterMeta, DataTableSelectionSingleChangeEvent, DataTableStateEvent, } from 'primereact/datatable';
 import { Column, ColumnFilterElementTemplateOptions } from 'primereact/column';
 import { Dropdown } from 'primereact/dropdown';
 import { InputText } from 'primereact/inputtext';
@@ -23,7 +23,6 @@ const TRACKS_INIT = [{ id: '', trackName: 'Loading tracks...', region: [''], sta
 const TrackSelect: React.FC<TrackSelectProps> = ({ updateSelectedTrackId }) => {
     const [trackChoices, setTrackChoices] = useState<Track[]>(TRACKS_INIT);
     const [selectedTrack, setSelectedTrack] = useState<Track | undefined>(undefined);
-    const [regions, setRegions] = useState<string[]>([]);
     const [filters, setFilters] = useState<DataTableFilterMeta>({
         region: { value: null, matchMode: FilterMatchMode.CUSTOM },
         trackName: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -35,11 +34,14 @@ const TrackSelect: React.FC<TrackSelectProps> = ({ updateSelectedTrackId }) => {
         const backendHost = import.meta.env.VITE_BACKEND_HOST || "";
         fetch(`${backendHost}/api/tracks`).then(res => res.json()).then((data: Track[]) => {
             setTrackChoices(data);
-            const regions = new Set(data.flatMap((track: Track) => track.region));
-            setRegions(Array.from(regions));
             setLoading(false); // Set loading to false after data is fetched
         });
     }, []);
+
+    const regions = useMemo(() => {
+        const regionSet = new Set(trackChoices.flatMap((track: Track) => track.region));
+        return Array.from(regionSet);
+    }, [trackChoices]);
 
     // Register the custom filter function
     // Seems to be the only way to get custom filter to work
@@ -56,11 +58,11 @@ const TrackSelect: React.FC<TrackSelectProps> = ({ updateSelectedTrackId }) => {
 
     };
 
-    const handleFilterChange = (e: any) => {
+    const handleFilterChange = (e: DataTableStateEvent) => {
         setFilters(e.filters);
     };
 
-    const regionFilterTemplate = (options: any) => {
+    const regionFilterTemplate = (options: ColumnFilterElementTemplateOptions) => {
         return (
             <Dropdown
                 value={options.value}
@@ -68,6 +70,7 @@ const TrackSelect: React.FC<TrackSelectProps> = ({ updateSelectedTrackId }) => {
                 onChange={(e) => options.filterApplyCallback(e.value)}
                 placeholder="Select a Region"
                 showClear
+                className="custom-filter-input"
             />
         );
     };
@@ -87,7 +90,7 @@ const TrackSelect: React.FC<TrackSelectProps> = ({ updateSelectedTrackId }) => {
             <InputText
                 onKeyDown={handleKeyDown}
                 placeholder="(press enter to search)"
-                className="p-inputtext p-component"
+                className="p-inputtext p-component custom-filter-input"
             />
         );
     };
