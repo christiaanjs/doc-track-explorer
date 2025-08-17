@@ -1,6 +1,6 @@
 import L from 'leaflet';
-import GeoJson from 'geojson';
-import { useEffect, useState, useRef, useContext, createContext } from 'react';
+import GeoJson from "geojson";
+import { useEffect, useState, useRef } from "react";
 import { MapContainer, TileLayer, GeoJSON as GeoJSONComponent, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import TrackSelect from './TrackSelect';
