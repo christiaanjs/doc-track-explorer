@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import { fetchDocJsonData, DocJSON } from "./docApi";
+import { fetchDocTrackData, DocJSON } from "./docApi";
 import { Cache } from "./cache";
 import { GeoJSON } from "./geoJson";
 import { convertToGpx } from "./gpxConverter";
@@ -28,7 +28,7 @@ interface Track {
 
 const ONE_DAY = 24 * 60 * 60 * 1000;
 const docJsonCache = new Cache<Map<string, DocJSON>>(ONE_DAY, async () => {
-  const data = await fetchDocJsonData();
+  const data = await fetchDocTrackData();
   return new Map(data.map((track: DocJSON) => [track.assetId, track]));
 });
 const mapStatus = (status: string): string => {

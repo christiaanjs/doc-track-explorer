@@ -6,9 +6,9 @@
         "outDir": "./dist",
         "strict": true,
         "esModuleInterop": true,
-        "moduleResolution": "nodenext",
+        "moduleResolution": "nodenext"
     },
     "include": [
-        "**/*.ts",
+        "**/*.ts"
     ]
 }
